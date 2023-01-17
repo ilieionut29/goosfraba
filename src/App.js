@@ -8,7 +8,6 @@ const GET_POSTS = gql`
     allPosts(count: 100) {
       title
       createdAt
-      # @format(formatString: "MMM")
       author {
         firstName
       }
