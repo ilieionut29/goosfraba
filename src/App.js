@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import Histogram from './components/Histogram';
+import TotalPosts from './components/TotalPosts';
 
 const GET_POSTS = gql`
   query {
@@ -8,16 +9,18 @@ const GET_POSTS = gql`
       title
       createdAt
       # @format(formatString: "MMM")
+      author {
+        firstName
+      }
     }
   }
 `;
 
 function App() {
   const [histogramData, setHistogramData] = useState([]);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth - 24);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight - 24);
   const [isValid, setIsValid] = useState(false);
-  const [postsNumber, setPostsNumber] = useState(0);
   const { loading, error, data } = useQuery(GET_POSTS);
   const months = [
     'Jan',
@@ -35,18 +38,18 @@ function App() {
   ];
 
   const colorMap = {
-    Jan: 'blue',
-    Feb: 'green',
-    Mar: 'red',
-    Apr: 'purple',
-    May: 'orange',
-    Jun: 'pink',
-    Jul: 'yellow',
-    Aug: 'gray',
-    Sep: 'brown',
-    Oct: 'black',
-    Nov: 'cyan',
-    Dec: 'magenta',
+    Jan: '#00B0FF',
+    Feb: '#F50057',
+    Mar: '#00BFA6',
+    Apr: '#FC427B',
+    May: '#e67e22',
+    Jun: '#be2edd',
+    Jul: '#f9ca24',
+    Aug: '#c7ecee',
+    Sep: '#9b59b6',
+    Oct: '#4cd137',
+    Nov: '#00a8ff',
+    Dec: '#F8EFBA',
   };
 
   useEffect(() => {
@@ -57,19 +60,23 @@ function App() {
         allPosts.map((item) => {
           const date = new Date(parseInt(item.createdAt));
           const month = date.toLocaleString('default', { month: 'short' });
-          return { month: month, postCount: 1 };
+          return {
+            month: month,
+            postCount: 1,
+            title: item.title,
+            author: item.author,
+          };
         })
       );
     }
 
     if (!loading && !error && histogramData.length !== 0) {
       setIsValid(true);
-      setPostsNumber(histogramData.length);
     }
 
     function handleResize() {
-      setWindowWidth(window.innerWidth);
-      setWindowHeight(window.innerHeight);
+      setWindowWidth(window.innerWidth - 24);
+      setWindowHeight(window.innerHeight - 24);
     }
 
     window.addEventListener('resize', handleResize);
@@ -81,14 +88,18 @@ function App() {
       {loading && <h1>Loading ...</h1>}
       {isValid && (
         <>
-        We have a total of {postsNumber} in 2019.
-        <Histogram
-          monthlyData={histogramData}
-          windowWidth={windowWidth}
-          windowHeight={windowHeight}
-          months={months}
-          colorMap={colorMap}
-        />
+          <Histogram
+            monthlyData={histogramData}
+            windowWidth={windowWidth}
+            windowHeight={windowHeight}
+            months={months}
+            colorMap={colorMap}
+          />
+
+          <TotalPosts
+            numberOfPosts={histogramData.length}
+            posts={histogramData}
+          />
         </>
       )}
     </>

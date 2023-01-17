@@ -1,5 +1,33 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #121212;
+}
+
+.histogram svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.box-number {
+  padding: 24px;
+}
+
+.box-number h1 {
+  font-size: 18px;
+  color: #f5f6fa;
+}
+
+.box-number button {
+  cursor: pointer;
+  padding: 6px;
+}
+
+.post-box {
+  color: #f5f6fa;
+  margin-bottom: 10px;
 }

@@ -28,8 +28,8 @@ const Histogram = ({
       .append('g')
       .attr('transform', `translate(${chartMargin.left}, ${chartMargin.top})`);
 
-    const x = d3.scaleBand().rangeRound([0, chartWidth]).padding(0.1);
-    const y = d3.scaleLinear().rangeRound([chartHeight, 24]);
+    const x = d3.scaleBand().rangeRound([0, chartWidth]).padding(0.24);
+    const y = d3.scaleLinear().rangeRound([chartHeight, 0]);
 
     x.domain(months);
     y.domain([0, d3.max(Object.values(data))]);
@@ -38,7 +38,8 @@ const Histogram = ({
       .append('g')
       .attr('class', 'axis axis-x')
       .attr('transform', `translate(0, ${chartHeight})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      .style('fill', (d) => colorMap[d]);
 
     svg
       .append('g')
@@ -51,22 +52,34 @@ const Histogram = ({
       );
 
     svg
+      .selectAll('.axis-x text')
+      .style('fill', (d) => colorMap[d])
+      .style('font-weight', 'bold');
+    svg.selectAll('.axis-x line').style('color', (d) => colorMap[d]);
+    svg.selectAll('.axis-x .domain').style('color', '#f5f6fa');
+    svg
+      .selectAll('.axis-y text')
+      .style('fill', '#f5f6fa')
+      .style('font-weight', 'bold');
+    svg.selectAll('.axis-y .domain').style('color', '#f5f6fa');
+
+    svg
       .selectAll('.bar')
       .data(months)
       .enter()
       .append('rect')
       .attr('class', 'bar')
       .attr('x', (d) => x(d))
-      .attr('y', chartHeight)
+      .attr('y', chartHeight - 24)
       .attr('width', x.bandwidth())
       .attr('height', 0)
-      .attr('rx', 5)
-      .attr('ry', 5)
+      .attr('rx', 12)
+      .attr('ry', 12)
       .style('fill', (d) => colorMap[d])
       .transition()
       .duration(1000)
       .delay((d, i) => i * 100)
-      .attr('y', (d) => y(data[d] ? data[d] : 0))
+      .attr('y', (d) => y(data[d] ? data[d] : 0) - 6)
       .attr('height', (d) =>
         y(data[d] ? data[d] : 0) > chartHeight
           ? 0
